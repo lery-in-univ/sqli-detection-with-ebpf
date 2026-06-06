@@ -19,7 +19,7 @@ ARTIFACTS_DIR = ROOT_DIR / "artifacts"
 DATASET_PATH = DATA_DIR / "payload_full.csv"
 
 PAYLOAD_COLUMNS = ["payload", "Payload", "value", "Value", "content", "Content", "param", "Parameter"]
-LABEL_COLUMNS = ["label", "Label", "type", "Type", "class", "Class"]
+ATTACK_TYPE_COLUMN = "attack_type"
 
 
 def main() -> None:
@@ -28,13 +28,16 @@ def main() -> None:
 
     df = pd.read_csv(DATASET_PATH)
     payload_col = _find_column(df, PAYLOAD_COLUMNS)
-    label_col = _find_column(df, LABEL_COLUMNS)
 
-    filtered = df[df[label_col].astype(str).str.lower().isin(["norm", "sqli"])].copy()
-    filtered["target"] = (filtered[label_col].astype(str).str.lower() == "sqli").astype(int)
+    if ATTACK_TYPE_COLUMN not in df.columns:
+        raise RuntimeError("payload_full.csv에 attack_type 컬럼이 없습니다")
+
+    attack_type = df[ATTACK_TYPE_COLUMN].astype(str).str.lower()
+    filtered = df[attack_type.isin(["norm", "sqli"])].copy()
+    filtered["target"] = (filtered[ATTACK_TYPE_COLUMN].astype(str).str.lower() == "sqli").astype(int)
 
     if filtered.empty:
-        raise RuntimeError("norm/sqli 라벨을 가진 학습 데이터가 없습니다")
+        raise RuntimeError("norm/sqli attack_type을 가진 학습 데이터가 없습니다")
 
     x = [feature_row(payload) for payload in filtered[payload_col]]
     y = filtered["target"].to_numpy()
@@ -72,6 +75,8 @@ def main() -> None:
     )
 
     print(f"데이터셋: {DATASET_PATH}")
+    print(f"정상 샘플 수: {(filtered['target'] == 0).sum()}")
+    print(f"SQLi 샘플 수: {(filtered['target'] == 1).sum()}")
     print(f"학습 샘플 수: {len(x_train)}")
     print(f"테스트 샘플 수: {len(x_test)}")
     print(classification_report(y_test, preds, target_names=["normal", "sqli"]))
