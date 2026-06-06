@@ -1,0 +1,14 @@
+images:
+  - location: "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
+    arch: "x86_64"
+  - location: "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-arm64.img"
+    arch: "aarch64"
+mounts:
+  - location: "~"
+    writable: true
+provision:
+  - mode: system
+    script: |
+      apt-get update
+      apt-get install -y python3 python3-pip python3-venv \
+        python3-bpfcc bpfcc-tools linux-headers-$(uname -r)
