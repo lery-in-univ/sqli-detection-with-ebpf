@@ -3,7 +3,7 @@
 2026-1에 수강한 AI네트워킹 강의의 기말 프로젝트입니다.
 
 > [!CAUTION]
-> 본 프로젝트에 포함된 코드는 AI(Codex)와 함께 작성하였으며, PoC 수준의 코드입니다. 활용에 유의 바랍니다.
+> 본 프로젝트에 포함된 코드는 AI(Codex)와 함께 작성하였으며, 충분한 검토가 동반되지 않은 PoC 수준의 코드입니다. 활용에 유의 바랍니다.
 
 ## 데이터
 
@@ -31,3 +31,7 @@ curl -L https://raw.githubusercontent.com/Morzeux/HttpParamsDataset/refs/heads/m
 - attach 인터페이스: `lo`
 - XDP 모드: generic XDP
 - 차단 기준: 최근 60초 내 RF와 LLM이 모두 SQLi로 판단한 이벤트 3회
+
+## LICENSE
+
+[MIT License](./LICENSE)
