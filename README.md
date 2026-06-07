@@ -7,7 +7,7 @@
 
 ## Prerequisites
 
-- Python 3.12
+- Python 3.10+
 - limactl 2.1.1
 
 ## 데이터
@@ -32,17 +32,25 @@ limactl shell sqli-ebpf
 
 # `python3-bpfcc`가 시스템의 파이썬에 설치되기 때문에,
 # `.venv`가 시스템의 site-packages를 볼 수 있게 합니다.
-python3 -m venv --system-site-packages .venv
+python3 -m venv --system-site-packages ~/sqli-ebpf-venv
+VENV_BIN=$HOME/sqli-ebpf-venv/bin
 
-# 의존성 설치
-uv sync
+# pip 업데이트
+$VENV_BIN/python -m pip install --upgrade pip
+
+# 기본 의존성 설치
+$VENV_BIN/pip install -r requirements.txt
+
+# LLM 의존성 설치
+$VENV_BIN/pip install --index-url https://download.pytorch.org/whl/cpu torch
+$VENV_BIN/pip install -r requirements-llm.txt
 
 # RandomForest 학습 실행
 # `artifacts` 디렉토리 하위에 `rf_model.pkl`, `feature-schema.json`, `metrics.json` 파일이 생성됩니다.
-uv run python -m src.training.train_rf
+$VENV_BIN/python -m src.training.train_rf
 
 # 감시 서버 실행
-sudo -E .venv/bin/uvicorn src.monitor.app:app --host 127.0.0.1 --port 9000
+sudo -E $VENV_BIN/uvicorn src.monitor.app:app --host 127.0.0.1 --port 9000
 ```
 
 ```shell
@@ -50,7 +58,7 @@ sudo -E .venv/bin/uvicorn src.monitor.app:app --host 127.0.0.1 --port 9000
 limactl shell sqli-ebpf
 
 # 웹 서버 실행
-uv run uvicorn src.web_server.app:app --host 0.0.0.0 --port 8000
+$HOME/sqli-ebpf-venv/bin/uvicorn src.web_server.app:app --host 0.0.0.0 --port 8000
 ```
 
 ## 테스트
