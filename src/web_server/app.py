@@ -11,7 +11,10 @@ from pydantic import BaseModel
 app = FastAPI()
 
 MONITOR_EVENT_URL = "http://127.0.0.1:9000/events/login"
-SUCCESS_CREDENTIALS = {("admin", "password")}
+SUCCESS_CREDENTIALS = {
+    ("admin", "password"),        # 일반적인 계정
+    ("something", "' OR '1'='1"), # SQLi 비밀번호지만 등록된 계정
+}
 
 
 class LoginRequest(BaseModel):
