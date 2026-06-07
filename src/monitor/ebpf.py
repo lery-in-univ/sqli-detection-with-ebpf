@@ -29,12 +29,17 @@ class EbpfBlocker:
             return
 
         program_path = ROOT_DIR / "src" / "ebpf" / "xdp_block.c"
-        self.bpf = BPF(src_file=str(program_path))
-        fn = self.bpf.load_func("xdp_block", BPF.XDP)
-        self.xdp_flags = BPF.XDP_FLAGS_SKB_MODE
-        self.bpf.attach_xdp(self.interface, fn, flags=self.xdp_flags)
-        self.blocked_ips = self.bpf.get_table("blocked_ips")
-        print(f"[ebpf] XDP attach 완료: {self.interface}")
+        try:
+            self.bpf = BPF(src_file=str(program_path))
+            fn = self.bpf.load_func("xdp_block", BPF.XDP)
+            self.xdp_flags = getattr(BPF, "XDP_FLAGS_SKB_MODE", 2)
+            self.bpf.attach_xdp(self.interface, fn, flags=self.xdp_flags)
+            self.blocked_ips = self.bpf.get_table("blocked_ips")
+            print(f"[ebpf] XDP attach 완료: {self.interface}")
+        except Exception as exc:
+            self.bpf = None
+            self.blocked_ips = None
+            print(f"[ebpf] XDP 로드 실패, eBPF 비활성화: {exc}")
 
     def stop(self) -> None:
         if self.bpf is None:

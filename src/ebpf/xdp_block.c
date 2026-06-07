@@ -1,6 +1,6 @@
 // BCC로 로드할 XDP 기반 IPv4 source IP 차단 프로그램
 
-#include <linux/bpf.h>
+#include <uapi/linux/bpf.h>
 #include <linux/if_ether.h>
 #include <linux/ip.h>
 

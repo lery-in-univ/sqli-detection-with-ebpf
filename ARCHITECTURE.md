@@ -147,7 +147,7 @@ flowchart LR
 - LLM 입력: Random Forest가 SQLi 의심으로 분류한 로그인 이벤트
 - LLM 출력: `normal` 또는 `sqli`
 - LLM 출력 파싱 실패: `normal` 처리
-- LLM timeout: 10초
+- LLM timeout: 60초
 - LLM timeout 발생 시 콘솔 로깅
 - 차단 조건: Random Forest와 LLM이 모두 SQLi로 판단
 - 차단 기준: 최근 60초 내 source IP별 의심 점수 3회 이상

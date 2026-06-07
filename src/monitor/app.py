@@ -36,7 +36,7 @@ class LlmJob:
 
 
 detector = RandomForestDetector(threshold=0.7)
-verifier = QwenZeroShotVerifier(timeout_seconds=10.0)
+verifier = QwenZeroShotVerifier(timeout_seconds=60.0)
 blocker = EbpfBlocker(interface="lo")
 llm_queue: asyncio.Queue[LlmJob] = asyncio.Queue()
 scores: dict[str, deque[float]] = defaultdict(deque)

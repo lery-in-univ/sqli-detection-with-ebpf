@@ -67,7 +67,7 @@ curl -i -X POST http://127.0.0.1:8000/login \
 # SQLi 포함 요청 (해당 요청이 60초 내 3번 시 차단)
 curl -i -X POST http://127.0.0.1:8000/login \
     -H 'Content-Type: application/json' \
-    -d '{"id":"admin OR 1=1","password":"x"}'
+    -d "{\"id\":\"admin' OR '1'='1\",\"password\":\"x\"}"
 
 # SQLi 의심되나 실제 비밀번호로 등록된 경우
 curl -i -X POST http://127.0.0.1:8000/login \
