@@ -30,6 +30,10 @@ limactl start --name=sqli-ebpf ./lima-config.yaml
 # Lima VM 쉘 연결
 limactl shell sqli-ebpf
 
+# `python3-bpfcc`가 시스템의 파이썬에 설치되기 때문에,
+# `.venv`가 시스템의 site-packages를 볼 수 있게 합니다.
+python3 -m venv --system-site-packages .venv
+
 # 의존성 설치
 uv sync
 
