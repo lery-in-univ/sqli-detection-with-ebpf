@@ -5,6 +5,11 @@
 > [!CAUTION]
 > 본 프로젝트에 포함된 코드는 AI(Codex)와 함께 작성하였으며, 충분한 검토가 동반되지 않은 PoC 수준의 코드입니다. 활용에 유의 바랍니다.
 
+## Prerequisites
+
+- Python 3.12
+- limactl 2.1.1
+
 ## 데이터
 
 ```bash
@@ -16,13 +21,62 @@ curl -L https://raw.githubusercontent.com/Morzeux/HttpParamsDataset/refs/heads/m
 
 ## 실행
 
-- 의존성 설치: `uv sync`
-- Random Forest 학습: `uv run python -m src.training.train_rf`
-- 감시 서버 실행: `uv run uvicorn src.monitor.app:app --host 127.0.0.1 --port 9000`
-- 웹 서버 실행: `uv run uvicorn src.web_server.app:app --host 0.0.0.0 --port 8000`
-- 성공 로그인: `admin` / `password`
-- 로그인 API: `POST /login`
-- 감시 이벤트 API: `POST /events/login`
+```shell
+# Lima VM 시작 (`Proceed with the current configuration` 선택)
+limactl start --name=sqli-ebpf ./lima-config.yaml
+```
+
+```shell
+# Lima VM 쉘 연결
+limactl shell sqli-ebpf
+
+# 의존성 설치
+uv sync
+
+# RandomForest 학습 실행
+# `artifacts` 디렉토리 하위에 `rf_model.pkl`, `feature-schema.json`, `metrics.json` 파일이 생성됩니다.
+uv run python -m src.training.train_rf
+
+# 감시 서버 실행
+sudo -E .venv/bin/uvicorn src.monitor.app:app --host 127.0.0.1 --port 9000
+```
+
+```shell
+# Lima VM 쉘 연결
+limactl shell sqli-ebpf
+
+# 웹 서버 실행
+uv run uvicorn src.web_server.app:app --host 0.0.0.0 --port 8000
+```
+
+## 테스트
+
+```shell
+# 일반적인 요청
+curl -i -X POST http://127.0.0.1:8000/login \
+  -H 'Content-Type: application/json' \
+  -d '{"id":"admin","password":"password"}'
+
+# SQLi 포함 요청 (해당 요청이 60초 내 3번 시 차단)
+curl -i -X POST http://127.0.0.1:8000/login \
+    -H 'Content-Type: application/json' \
+    -d '{"id":"admin OR 1=1","password":"x"}'
+
+# SQLi 의심되나 실제 비밀번호로 등록된 경우
+curl -i -X POST http://127.0.0.1:8000/login \
+    -H 'Content-Type: application/json' \
+    -d "{\"id\":\"something\",\"password\":\"' OR '1'='1\"}"
+```
+
+## 정리
+
+```shell
+# VM 정지
+limactl stop sqli-ebpf
+
+# VM 삭제
+limactl delete sqli-ebpf
+```
 
 ## eBPF
 
